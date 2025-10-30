@@ -3,21 +3,19 @@ from api.serializers import ProductSerializer, OrderSerilizer, OrderItemSerizer
 from api.models import Product, Order, OrderItem
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+#####
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
-@api_view(['GET'])
-def product_list(request):
-    products = Product.objects.all()
-    serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
+from rest_framework import generics
 
-@api_view(['GET'])
-def product_details(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    serializer = ProductSerializer(product)
-    return Response(serializer.data)
+from rest_framework import viewsets
 
-@api_view(['GET'])
-def order_list(request):
-    orders = Order.objects.all()
-    serializer = OrderSerilizer(orders, many=True)
-    return Response(serializer.data)
+class product_list(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+class order_list(viewsets.ModelViewSet):
+    queryset = Order.objects.all().prefetch_related('items__product')
+    serializer_class = OrderSerilizer
